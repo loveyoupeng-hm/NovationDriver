@@ -1,26 +1,13 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(PluginTests)
+project(Tests)
 
 enable_testing()
 
-add_executable(${PROJECT_NAME} test.cpp)
+function(add_test_case NAME LIBS)
+    add_executable(${NAME} ${NAME})
+    target_link_libraries(${NAME} gtest gtest_main gmock ${LIBS})
+    add_test(${NAME} ${NAME})
+endfunction()
 
-target_include_directories(
-    ${PROJECT_NAME}
-    PRIVATE
-        ${GOOGLE_TEST_SOURCE_DIR}/googletest/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../HelloWorld/includes
-        ${JUCE_SOURCE_DIR}/modules
-)
-
-target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-        HelloWorld
-        juce::juce_dsp
-        GTest::gtest_main
-)
-
-include(GoogleTest)
-gtest_discover_tests(${PROJECT_NAME})
+add_test_case(test juce::juce_dsp)

@@ -46,7 +46,6 @@
 
 #pragma once
 
-#include <string>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -69,14 +68,6 @@ public:
     {
         ignoreUnused(samplesPerBlock);
         ignoreUnused(sampleRate);
-
-        auto header = getPlayHead();
-
-        if (editor && header)
-        {
-            auto value = "Host BPM:";// + juce::String(header->getPosition()->getBpm().orFallback(0.0));
-            editor->logMessage(value);
-        }
     }
 
     void releaseResources() override {}
