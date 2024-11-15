@@ -55,14 +55,11 @@ class VstProcessorEditor;
 using namespace juce;
 
 //==============================================================================
-class VstProcessor : public juce::AudioProcessor, private juce::ChangeBroadcaster
+class VstProcessor : public juce::AudioProcessor 
 {
 public:
     //==============================================================================
-    VstProcessor()
-        : AudioProcessor(BusesProperties()) // add no audio buses at all
-    {
-    }
+    VstProcessor();
 
     //==============================================================================
     void prepareToPlay(double, int) override { }
@@ -103,6 +100,10 @@ private:
     //==============================================================================
 
     juce::AudioPlayHead *head;
+    uint64_t count = 0;
+    AudioParameterFloat* bpm;
+    juce::SpinLock mutex;
+
 
     VstProcessorEditor *editor;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VstProcessor)

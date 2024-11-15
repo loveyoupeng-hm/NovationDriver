@@ -7,15 +7,20 @@
 using namespace juce;
 
 class VstProcessorEditor : public juce::AudioProcessorEditor,
-                           public juce::ChangeListener,
+                           public juce::AudioProcessorListener,
                            private juce::MidiInputCallback,
+                           private AsyncUpdater,
                            private juce::MidiKeyboardStateListener
 {
 public:
     VstProcessorEditor(VstProcessor *p);
 
     ~VstProcessorEditor() override;
-    virtual void changeListenerCallback(ChangeBroadcaster *) override;
+    void audioProcessorParameterChanged (AudioProcessor* sourceProcessor,
+                                                 int parameterIndex,
+                                                 float newValue) override;
+    void audioProcessorChanged (AudioProcessor* , const ChangeDetails&) override { };
+    void handleAsyncUpdate() override;
 
     void paint(juce::Graphics &g) override;
     void resized() override;
@@ -66,6 +71,9 @@ private:
     juce::TextEditor midiMessagesBox;
     double startTime;
     VstProcessor *processor;
+    CriticalSection lock;
+    float bpm = 0;
+
     static const uint8 enableDAWSysex[];
     static const uint8 disableDAWSysex[];
     static const uint8 faderSysex[];

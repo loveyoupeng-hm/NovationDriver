@@ -85,10 +85,28 @@ VstProcessorEditor::~VstProcessorEditor()
     if (midiDevice != nullptr)
         midiDevice->sendMessageNow(disableDAW);
 }
-
-void VstProcessorEditor ::changeListenerCallback(ChangeBroadcaster *)
+void VstProcessorEditor::audioProcessorParameterChanged(AudioProcessor *sourceProcessor,
+                                                        int parameterIndex,
+                                                        float newValue)
 {
-    logMessage(processor->getName());
+    {
+        const ScopedLock sl(lock);
+        bpm = newValue;
+    }
+    if (MessageManager::getInstance()->isThisTheMessageThread())
+    {
+        handleAsyncUpdate();
+    }
+    else
+        triggerAsyncUpdate();
+    juce::ignoreUnused(sourceProcessor);
+    juce::ignoreUnused(parameterIndex);
+}
+
+void VstProcessorEditor::handleAsyncUpdate()
+{
+    const ScopedLock sl (lock);
+    logMessage(processor->getName() + " " + juce::String(bpm));
 }
 
 void VstProcessorEditor ::paint(juce::Graphics &g)
@@ -205,14 +223,14 @@ void VstProcessorEditor::setMidiInput(int index)
 }
 
 // These methods handle callbacks from the midi device + on-screen keyboard..
-void VstProcessorEditor::handleIncomingMidiMessage(juce::MidiInput *source, const juce::MidiMessage &message) 
+void VstProcessorEditor::handleIncomingMidiMessage(juce::MidiInput *source, const juce::MidiMessage &message)
 {
     const juce::ScopedValueSetter<bool> scopedInputFlag(isAddingFromMidiInput, true);
     keyboardState.processNextMidiEvent(message);
     postMessageToList(message, source->getName());
 }
 
-void VstProcessorEditor::handleNoteOn(juce::MidiKeyboardState *, int midiChannel, int midiNoteNumber, float velocity) 
+void VstProcessorEditor::handleNoteOn(juce::MidiKeyboardState *, int midiChannel, int midiNoteNumber, float velocity)
 {
     if (!isAddingFromMidiInput)
     {
@@ -222,7 +240,7 @@ void VstProcessorEditor::handleNoteOn(juce::MidiKeyboardState *, int midiChannel
     }
 }
 
-void VstProcessorEditor::handleNoteOff(juce::MidiKeyboardState *, int midiChannel, int midiNoteNumber, float /*velocity*/) 
+void VstProcessorEditor::handleNoteOff(juce::MidiKeyboardState *, int midiChannel, int midiNoteNumber, float /*velocity*/)
 {
     if (!isAddingFromMidiInput)
     {

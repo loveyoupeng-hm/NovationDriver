@@ -1,30 +1,36 @@
 #include "VstProcessor.h"
 #include "VstProcessorEditor.h"
+#include <iostream>
 using namespace juce;
+
+
+VstProcessor::VstProcessor() : AudioProcessor(BusesProperties())  // add no audio buses at all
+{
+        addParameter (bpm = new AudioParameterFloat({ "Bpm", 0 }, "BPM", 0.0, 300.0, 80.0));
+}
 
 void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
 {
-    if(!midi.isEmpty())
+    
+    count += 1;
+    if(count % 100 == 0)
     {
-        this->sendChangeMessage();
+        this->sendParamChangeMessageToListeners(0, bpm->get());
     }
 
-    if (!head)
+    if (editor && editor->isEnabled() && !head)
     {
-        auto tmp = getPlayHead();
+        auto* tmp = getPlayHead();
         if (tmp != head && tmp != nullptr)
         {
             head = tmp;
             if (editor)
             {
                 auto position = head->getPosition();
-                if (position->getIsPlaying())
-                {
-                    this->sendChangeMessage();
+                if(position.hasValue()){
+                    *bpm = static_cast<float>(*(position->getBpm()));
+                    sendParamChangeMessageToListeners(0, bpm->get());
                 }
-
-                // if (static_cast<bool>(position))
-                // editor->logMessage("BPM : ");
             }
         }
     }
@@ -73,7 +79,7 @@ void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
 
 AudioProcessorEditor *VstProcessor::createEditor()
 {
-    auto result = new VstProcessorEditor(this);
-    addChangeListener(result);
-    return result;
+    editor = new VstProcessorEditor(this);
+    addListener(editor);
+    return editor;
 }
