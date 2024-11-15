@@ -41,5 +41,7 @@ target_include_directories(
 target_sources(
     ${PROJECT_NAME}
     PRIVATE
+        source/VstProcessor.cpp
+        source/VstProcessorEditor.cpp
         source/Main.cpp
 )
