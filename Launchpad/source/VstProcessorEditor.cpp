@@ -51,7 +51,6 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     // find the first enabled device and use that by default
     for (auto input : midiInputs)
     {
-        const ScopedLock sl{lock};
         if (deviceManager.isMidiInputDeviceEnabled(input.identifier))
         {
             setMidiInput(midiInputs.indexOf(input));
@@ -63,14 +62,12 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     if (midiInputList.getSelectedId() == 0)
         setMidiInput(0);
 
+
     addAndMakeVisible(keyboardComponent);
     keyboardState.addListener(this);
-
     addAndMakeVisible(launchpad);
-    auto area = getLocalBounds();
-    launchpad.setSize(200, 200);
-
     addAndMakeVisible(midiMessagesBox);
+    midiMessagesBox.setSize(600, 400);
     midiMessagesBox.setMultiLine(true);
     midiMessagesBox.setReturnKeyStartsNewLine(true);
     midiMessagesBox.setReadOnly(true);
@@ -81,7 +78,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     midiMessagesBox.setColour(juce::TextEditor::outlineColourId, juce::Colour(0x1c000000));
     midiMessagesBox.setColour(juce::TextEditor::shadowColourId, juce::Colour(0x16000000));
 
-    setSize(600, 800);
+    setSize(600, 1200);
 }
 
 VstProcessorEditor::~VstProcessorEditor()
@@ -112,7 +109,8 @@ void VstProcessorEditor::resized()
 
     midiInputList.setBounds(area.removeFromTop(36).removeFromRight(getWidth() - 150).reduced(8));
     keyboardComponent.setBounds(area.removeFromTop(80).reduced(8));
-    midiMessagesBox.setBounds(area.reduced(8));
+    midiMessagesBox.setBounds(area.removeFromTop(300).reduced(8));
+    launchpad.setBounds(area.reduced(8));
 }
 
 void VstProcessorEditor::logMessage(const juce::String m)

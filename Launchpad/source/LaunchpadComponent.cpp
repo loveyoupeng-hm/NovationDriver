@@ -2,6 +2,8 @@
 
 LaunchpadComponent::LaunchpadComponent()
 {
+    auto area = getLocalBounds();
+    setSize(area.getWidth(), area.getWidth());
 }
 void LaunchpadComponent::paint(juce::Graphics &g) {
     g.fillAll (juce::Colours::black);

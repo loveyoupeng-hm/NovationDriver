@@ -65,8 +65,6 @@ private:
     juce::TextEditor midiMessagesBox;
     double startTime;
     VstProcessor *processor;
-    CriticalSection lock;
-    float bpm = 0;
     LaunchpadComponent launchpad;
 
     static const uint8 enableDAWSysex[];
