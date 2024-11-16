@@ -28,6 +28,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
       keyboardComponent(keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard),
       startTime(juce::Time::getMillisecondCounterHiRes() * 0.001), processor{p}
 {
+    startTimer(2000);
     setOpaque(true);
 
     addAndMakeVisible(midiInputListLabel);
@@ -50,6 +51,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     // find the first enabled device and use that by default
     for (auto input : midiInputs)
     {
+        const ScopedLock sl{lock};
         if (deviceManager.isMidiInputDeviceEnabled(input.identifier))
         {
             setMidiInput(midiInputs.indexOf(input));
@@ -64,6 +66,10 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     addAndMakeVisible(keyboardComponent);
     keyboardState.addListener(this);
 
+    addAndMakeVisible(launchpad);
+    auto area = getLocalBounds();
+    launchpad.setSize(200, 200);
+
     addAndMakeVisible(midiMessagesBox);
     midiMessagesBox.setMultiLine(true);
     midiMessagesBox.setReturnKeyStartsNewLine(true);
@@ -75,7 +81,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     midiMessagesBox.setColour(juce::TextEditor::outlineColourId, juce::Colour(0x1c000000));
     midiMessagesBox.setColour(juce::TextEditor::shadowColourId, juce::Colour(0x16000000));
 
-    setSize(600, 400);
+    setSize(600, 800);
 }
 
 VstProcessorEditor::~VstProcessorEditor()
@@ -83,38 +89,24 @@ VstProcessorEditor::~VstProcessorEditor()
     keyboardState.removeListener(this);
     deviceManager.removeMidiInputDeviceCallback(juce::MidiInput::getAvailableDevices()[midiInputList.getSelectedItemIndex()].identifier, this);
     if (midiDevice != nullptr)
+    {
         midiDevice->sendMessageNow(disableDAW);
-}
-void VstProcessorEditor::audioProcessorParameterChanged(AudioProcessor *sourceProcessor,
-                                                        int parameterIndex,
-                                                        float newValue)
-{
-    {
-        const ScopedLock sl(lock);
-        bpm = newValue;
+        midiDevice = nullptr;
     }
-    if (MessageManager::getInstance()->isThisTheMessageThread())
-    {
-        handleAsyncUpdate();
-    }
-    else
-        triggerAsyncUpdate();
-    juce::ignoreUnused(sourceProcessor);
-    juce::ignoreUnused(parameterIndex);
+
 }
 
-void VstProcessorEditor::handleAsyncUpdate()
+void VstProcessorEditor::timerCallback()
 {
-    const ScopedLock sl (lock);
-    logMessage(processor->getName() + " " + juce::String(bpm));
+    logMessage(processor->getName() + " " + juce::String(processor->getBpm()));
 }
 
-void VstProcessorEditor ::paint(juce::Graphics &g)
+void VstProcessorEditor::paint(juce::Graphics &g)
 {
     g.fillAll(juce::Colours::black);
 }
 
-void VstProcessorEditor ::resized()
+void VstProcessorEditor::resized()
 {
     auto area = getLocalBounds();
 
@@ -123,13 +115,15 @@ void VstProcessorEditor ::resized()
     midiMessagesBox.setBounds(area.reduced(8));
 }
 
-void VstProcessorEditor ::logMessage(const juce::String m)
+void VstProcessorEditor::logMessage(const juce::String m)
 {
+    if(!isEnabled())
+        return;
     midiMessagesBox.moveCaretToEnd();
     midiMessagesBox.insertTextAtCaret(m + juce::newLine);
 }
 
-juce::String VstProcessorEditor ::getMidiMessageDescription(const juce::MidiMessage &m)
+juce::String VstProcessorEditor::getMidiMessageDescription(const juce::MidiMessage &m)
 {
     if (m.isNoteOn())
         return "Note on " + juce::MidiMessage::getMidiNoteName(m.getNoteNumber(), true, true, 3);

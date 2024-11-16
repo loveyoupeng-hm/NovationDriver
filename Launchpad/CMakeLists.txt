@@ -43,5 +43,6 @@ target_sources(
     PRIVATE
         source/VstProcessor.cpp
         source/VstProcessorEditor.cpp
+        source/LaunchpadComponent.cpp
         source/Main.cpp
 )

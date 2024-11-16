@@ -3,29 +3,23 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "VstProcessor.h"
+#include "LaunchpadComponent.h"
 
 using namespace juce;
 
 class VstProcessorEditor : public juce::AudioProcessorEditor,
-                           public juce::AudioProcessorListener,
+                           private juce::Timer,
                            private juce::MidiInputCallback,
-                           private AsyncUpdater,
                            private juce::MidiKeyboardStateListener
 {
 public:
     VstProcessorEditor(VstProcessor *p);
-
     ~VstProcessorEditor() override;
-    void audioProcessorParameterChanged (AudioProcessor* sourceProcessor,
-                                                 int parameterIndex,
-                                                 float newValue) override;
-    void audioProcessorChanged (AudioProcessor* , const ChangeDetails&) override { };
-    void handleAsyncUpdate() override;
-
     void paint(juce::Graphics &g) override;
     void resized() override;
 
 private:
+    void timerCallback() override;
     void logMessage(const juce::String m);
     static juce::String getMidiMessageDescription(const juce::MidiMessage &m);
 
@@ -73,6 +67,7 @@ private:
     VstProcessor *processor;
     CriticalSection lock;
     float bpm = 0;
+    LaunchpadComponent launchpad;
 
     static const uint8 enableDAWSysex[];
     static const uint8 disableDAWSysex[];

@@ -50,61 +50,61 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_dsp/juce_dsp.h>
+#include <atomic>
 class VstProcessorEditor;
 
 using namespace juce;
 
 //==============================================================================
-class VstProcessor : public juce::AudioProcessor 
+class VstProcessor : public juce::AudioProcessor
 {
 public:
-    //==============================================================================
-    VstProcessor();
+  //==============================================================================
+  VstProcessor();
 
-    //==============================================================================
-    void prepareToPlay(double, int) override { }
-    void releaseResources() override {}
-    void processBlock(AudioBuffer<double> &, MidiBuffer &) override {}
-    void processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi) override;
+  //==============================================================================
+  void prepareToPlay(double, int) override {}
+  void releaseResources() override {}
+  void processBlock(AudioBuffer<double> &, MidiBuffer &) override {}
+  void processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi) override;
 
-    //==============================================================================
-    bool isMidiEffect() const override { return true; }
 
-    //==============================================================================
+  //==============================================================================
+  bool isMidiEffect() const override { return true; }
 
-    bool hasEditor() const override { return true; }
+  //==============================================================================
 
-    //==============================================================================
-    const String getName() const override { return "VstProcessor"; }
+  bool hasEditor() const override { return true; }
 
-    bool acceptsMidi() const override { return true; }
-    bool producesMidi() const override { return true; }
-    double getTailLengthSeconds() const override { return 0; }
+  //==============================================================================
+  const String getName() const override { return "VstProcessor"; }
 
-    //==============================================================================
-    int getNumPrograms() override { return 1; }
-    int getCurrentProgram() override { return 0; }
-    void setCurrentProgram(int) override {}
-    const String getProgramName(int) override { return "None"; }
-    void changeProgramName(int, const String &) override {}
-    AudioProcessorEditor *createEditor();
+  bool acceptsMidi() const override { return true; }
+  bool producesMidi() const override { return true; }
+  double getTailLengthSeconds() const override { return 0; }
 
-    //==============================================================================
-    void getStateInformation(MemoryBlock &) override{}
+  //==============================================================================
+  int getNumPrograms() override { return 1; }
+  int getCurrentProgram() override { return 0; }
+  void setCurrentProgram(int) override {}
+  const String getProgramName(int) override { return "None"; }
+  void changeProgramName(int, const String &) override {}
+  AudioProcessorEditor *createEditor();
 
-    void setStateInformation(const void *, int) override {}
+  float getBpm() { return bpm;}
+
+  //==============================================================================
+  void getStateInformation(MemoryBlock &) override {}
+
+  void setStateInformation(const void *, int) override {}
 
 private:
-    //==============================================================================
+  //==============================================================================
 
-    //==============================================================================
+  //==============================================================================
 
-    juce::AudioPlayHead *head;
-    uint64_t count = 0;
-    AudioParameterFloat* bpm;
-    juce::SpinLock mutex;
-
-
-    VstProcessorEditor *editor;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VstProcessor)
+  void updateBpm();
+  std::atomic<float> bpm{100.0f};
+  VstProcessorEditor *editor;
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VstProcessor)
 };
