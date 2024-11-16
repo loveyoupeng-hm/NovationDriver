@@ -63,7 +63,7 @@ public:
   VstProcessor();
 
   //==============================================================================
-  void prepareToPlay(double, int) override {}
+  void prepareToPlay(double sampleRate, int samplesPerBlock) override;
   void releaseResources() override {}
   void processBlock(AudioBuffer<double> &, MidiBuffer &) override {}
   void processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi) override;
@@ -106,5 +106,9 @@ private:
   void updateBpm();
   std::atomic<float> bpm{100.0f};
   VstProcessorEditor *editor;
+  SortedSet<int> notes;
+  int currentNote, lastNoteValue;
+ int time;
+    float rate;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VstProcessor)
 };
