@@ -13,7 +13,7 @@ void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi) {
   juce::ignoreUnused(buffer);
   juce::ignoreUnused(midi);
   // A pure MIDI plugin shouldn't be provided any audio data
-  midi.clear();
+  // midi.clear();
 
   // however we use the buffer to get timing information
   // auto numSamples = buffer.getNumSamples();

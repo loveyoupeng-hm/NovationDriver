@@ -183,7 +183,7 @@ void VstProcessorEditor::setMidiInput(int index)
             {
                 for (uint col = 0; col < 8; ++col)
                 {
-                    u_char note = 11 + (row * 8) + col;
+                    u_char note = 11 + (row * 10) + col;
                     u_char color = 24 + (col * 8) + row;
                     juce::MidiMessage msg{new uint8[9]{0x90, note, color}, 3};
                     msg.setChannel(channel);
