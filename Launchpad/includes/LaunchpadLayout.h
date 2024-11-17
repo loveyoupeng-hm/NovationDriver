@@ -180,7 +180,7 @@ private:
             LightInfo{LightType::STATIC, MidiType::CC, 0x59, SCENE_COLOR_0},
             LightInfo{LightType::STATIC, MidiType::CC, 0x4F, SCENE_COLOR_1},
             LightInfo{LightType::STATIC, MidiType::CC, 0x45, SCENE_COLOR_2},
-            LightInfo{LightType::STATIC, MidiType::CC, 0x38, SCENE_COLOR_3},
+            LightInfo{LightType::STATIC, MidiType::CC, 0x3B, SCENE_COLOR_3},
             LightInfo{LightType::STATIC, MidiType::CC, 0x31, SCENE_COLOR_4},
             LightInfo{LightType::STATIC, MidiType::CC, 0x27, SCENE_COLOR_5},
             LightInfo{LightType::STATIC, MidiType::CC, 0x1D, SCENE_COLOR_6},
