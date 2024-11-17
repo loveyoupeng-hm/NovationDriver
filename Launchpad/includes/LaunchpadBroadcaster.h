@@ -49,8 +49,8 @@ public:
         if (MessageManager::getInstance()->isThisTheMessageThread())
         {
             const uint16_t value = button.load();
-            button = static_cast<uint16_t>(666);
-            if (value == 666)
+            button = static_cast<uint16_t>(2048);
+            if (value == 2048)
                 return;
 
             const uint8 x = value >> 8;
@@ -70,7 +70,7 @@ private:
     juce::ListenerList<LaunchpadBroadcaster::Listener>
         listeners;
 
-    std::atomic<uint16_t> button;
+    std::atomic<uint16_t> button{static_cast<uint16_t>(2048)};
 
     void handleAsyncUpdate() override
     {

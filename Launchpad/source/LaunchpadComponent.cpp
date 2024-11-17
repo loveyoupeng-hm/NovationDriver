@@ -124,7 +124,7 @@ void LaunchpadComponent::paint(juce::Graphics &g)
 
 void LaunchpadComponent::resized() {}
 
-void LaunchpadComponent::mouseDoubleClick(const MouseEvent &event)
+void LaunchpadComponent::mouseDown(const MouseEvent &event)
 {
     int x = event.getPosition().getX();
     int y = event.getPosition().getY();

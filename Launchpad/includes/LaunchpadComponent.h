@@ -14,7 +14,7 @@ public:
     ~LaunchpadComponent() override {};
     void paint(juce::Graphics &g) override;
     void resized() override;
-    void mouseDoubleClick (const MouseEvent& event) override;
+    void mouseDown(const MouseEvent& event) override;
     void
     add(LaunchpadBroadcaster::Listener &callback)
     {
