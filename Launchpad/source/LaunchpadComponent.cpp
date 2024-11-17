@@ -21,7 +21,11 @@ void LaunchpadComponent::paint(juce::Graphics &g)
 
     for (int i = 0; i < 8; i++)
     {
-        g.setColour(juce::Colours::grey);
+        if (upclicked[i])
+            g.setColour(juce::Colours::goldenrod);
+        else
+            g.setColour(juce::Colours::grey);
+
         int start = 10 + i * 60 + 5;
         int end = 10 + 5;
         g.drawRect(start, end, 60, 60, 2);
@@ -74,7 +78,11 @@ void LaunchpadComponent::paint(juce::Graphics &g)
 
     for (int i = 0; i < 8; i++)
     {
-        g.setColour(juce::Colours::grey);
+        if (rightclicked[i])
+            g.setColour(juce::Colours::lightcoral);
+        else
+            g.setColour(juce::Colours::grey);
+
         int start = 10 + 7 * 60 + 5 + 60 + 10;
         int end = 80 + i * 60 + 5;
         g.drawRect(start, end, 60, 60, 2);
