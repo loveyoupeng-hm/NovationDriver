@@ -44,5 +44,8 @@ target_sources(
         source/VstProcessor.cpp
         source/VstProcessorEditor.cpp
         source/LaunchpadComponent.cpp
+        source/LaunchpadBroadcaster.cpp
+        source/LaunchpadLayout.cpp
+        source/LaunchpadDriver.cpp
         source/Main.cpp
 )

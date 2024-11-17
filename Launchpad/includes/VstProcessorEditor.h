@@ -4,6 +4,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "VstProcessor.h"
 #include "LaunchpadComponent.h"
+#include "LaunchpadDriver.h"
 
 using namespace juce;
 
@@ -63,25 +64,11 @@ private:
 
     juce::MidiKeyboardState keyboardState;         // [5]
     juce::MidiKeyboardComponent keyboardComponent; // [6]
-    std::unique_ptr<juce::MidiOutput> midiDevice{nullptr};
-
+    LaunchpadDriver driver;
     juce::TextEditor midiMessagesBox;
     double startTime;
     VstProcessor *processor;
     LaunchpadComponent launchpad;
-
-    static const uint8 enableDAWSysex[];
-    static const uint8 disableDAWSysex[];
-    static const uint8 faderSysex[];
-    static const uint8 enableFaderSysex[];
-    static const uint8 clearSessionSysex[];
-    static const uint8 selectSessionLayoutSysex[];
-    static const juce::MidiMessage enableDAW;
-    static const juce::MidiMessage disableDAW;
-    static const juce::MidiMessage fader;
-    static const juce::MidiMessage enableFader;
-    static const juce::MidiMessage clearSession;
-    static const juce::MidiMessage selectSessionLayout;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VstProcessorEditor)

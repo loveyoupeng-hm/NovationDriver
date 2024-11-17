@@ -1,28 +1,6 @@
 #include "VstProcessorEditor.h"
 using namespace juce;
 
-const uint8 VstProcessorEditor::enableDAWSysex[] = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x10, 0x01, 0xF7};
-const uint8 VstProcessorEditor::disableDAWSysex[] = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x10, 0x00, 0xF7};
-const uint8 VstProcessorEditor::faderSysex[] = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x01, 0x00, 0x00,
-                                                0x00, 0x00, 0x07, 0x25,
-                                                0x01, 0x00, 0x08, 0x26,
-                                                0x02, 0x00, 0x09, 0x27,
-                                                0x03, 0x00, 0x10, 0x28,
-                                                0x04, 0x01, 0x11, 0x29,
-                                                0x05, 0x01, 0x12, 0x30,
-                                                0x06, 0x01, 0x13, 0x31,
-                                                0x07, 0x01, 0x14, 0x32,
-                                                0xF7};
-const uint8 VstProcessorEditor::enableFaderSysex[] = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x00, 0x0D, 0xF7};
-const uint8 VstProcessorEditor::clearSessionSysex[] = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x12, 0x01, 0x00, 0x00, 0xF7};
-const uint8 VstProcessorEditor::selectSessionLayoutSysex[] = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x00, 0x00, 0xF7};
-const juce::MidiMessage VstProcessorEditor::enableDAW{VstProcessorEditor::enableDAWSysex, 9};
-const juce::MidiMessage VstProcessorEditor::disableDAW{VstProcessorEditor::disableDAWSysex, 9};
-const juce::MidiMessage VstProcessorEditor::fader{VstProcessorEditor::faderSysex, 10 + 4 * 8};
-const juce::MidiMessage VstProcessorEditor::enableFader{VstProcessorEditor::enableFaderSysex, 9};
-const juce::MidiMessage VstProcessorEditor::clearSession{VstProcessorEditor::clearSessionSysex, 11};
-const juce::MidiMessage VstProcessorEditor::selectSessionLayout{VstProcessorEditor::selectSessionLayoutSysex, 9};
-
 VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     : AudioProcessorEditor(p),
       keyboardComponent(keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard),
@@ -62,7 +40,6 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     if (midiInputList.getSelectedId() == 0)
         setMidiInput(0);
 
-
     addAndMakeVisible(keyboardComponent);
     keyboardState.addListener(this);
     addAndMakeVisible(launchpad);
@@ -86,12 +63,7 @@ VstProcessorEditor::~VstProcessorEditor()
 {
     keyboardState.removeListener(this);
     deviceManager.removeMidiInputDeviceCallback(juce::MidiInput::getAvailableDevices()[midiInputList.getSelectedItemIndex()].identifier, this);
-    if (midiDevice != nullptr)
-    {
-        midiDevice->sendMessageNow(disableDAW);
-        midiDevice = nullptr;
-    }
-
+    
 }
 
 void VstProcessorEditor::buttonPressed(uint8 x, uint8 y)
@@ -99,8 +71,9 @@ void VstProcessorEditor::buttonPressed(uint8 x, uint8 y)
     logMessage("Button Pressed " + juce::String(x) + ", " + juce::String(y));
 }
 
-void VstProcessorEditor::scenePressed(uint8 scene) { 
-    logMessage("Scene Pressed " + juce::String(scene)); 
+void VstProcessorEditor::scenePressed(uint8 scene)
+{
+    logMessage("Scene Pressed " + juce::String(scene));
 }
 
 void VstProcessorEditor::timerCallback()
@@ -125,7 +98,7 @@ void VstProcessorEditor::resized()
 
 void VstProcessorEditor::logMessage(const juce::String m)
 {
-    if(!isEnabled())
+    if (!isEnabled())
         return;
     midiMessagesBox.moveCaretToEnd();
     midiMessagesBox.insertTextAtCaret(m + juce::newLine);
@@ -180,44 +153,7 @@ void VstProcessorEditor::setMidiInput(int index)
 
         if (newInput.name.equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA"))
         {
-
-            midiDevice = juce::MidiOutput::openDevice(newInput.identifier);
-            midiDevice->sendMessageNow(disableDAW);
-            midiDevice->sendMessageNow(enableDAW);
-            // midiDevice->sendMessageNow(fader);
-            // midiDevice->sendMessageNow(enableFader);
-            midiDevice->sendMessageNow(selectSessionLayout);
-            midiDevice->sendMessageNow(clearSession);
-            int channel = 1;
-            for (uint row = 0; row < 8; ++row)
-            {
-                for (uint col = 0; col < 8; ++col)
-                {
-                    u_char note = 11 + (row * 10) + col;
-                    u_char color = 24 + (col * 8) + row;
-                    juce::MidiMessage msg{new uint8[9]{0x90, note, color}, 3};
-                    msg.setChannel(channel);
-                    midiDevice->sendMessageNow(msg);
-                }
-                channel++;
-                if (channel > 3)
-                    channel = 1;
-            }
-
-            juce::MidiMessage up{new uint8[9]{0xB0, 0x5B, 13}, 3};
-            midiDevice->sendMessageNow(up);
-            juce::MidiMessage down{new uint8[9]{0xB0, 0x5C, 13}, 3};
-            midiDevice->sendMessageNow(down);
-            juce::MidiMessage left{new uint8[9]{0xB0, 0x5D, 50}, 3};
-            midiDevice->sendMessageNow(left);
-            juce::MidiMessage right{new uint8[9]{0xB0, 0x5E, 50}, 3};
-            midiDevice->sendMessageNow(right);
-
-            for (int i = 0; i < 8; i++)
-            {
-                juce::MidiMessage scene{new uint8[9]{0xB0, static_cast<uint8>(i * 10 + 19), static_cast<uint8>(25 + i)}, 3};
-                midiDevice->sendMessageNow(scene);
-            }
+            driver.initialize(juce::MidiOutput::openDevice(newInput.identifier));
         }
     }
 
