@@ -12,6 +12,13 @@ public:
     ~LaunchpadComponent() override {};
     void paint(juce::Graphics &g) override;
     void resized() override;
+    void mouseDoubleClick (const MouseEvent& event) override;
+
+private:
+    bool clicked[8][8];
+    bool upclicked[8];
+    bool rightclicked[8];
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LaunchpadComponent)
 };

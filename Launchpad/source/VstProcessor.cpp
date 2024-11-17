@@ -51,8 +51,8 @@ void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi) {
 
       if (notes.size() > 0)
       {
-          currentNote = currentNote++ % notes.size();
-          lastNoteValue = notes[currentNote];
+          currentNote %= notes.size();
+          lastNoteValue = notes[currentNote++];
           midi.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127),
           offset);
       }
