@@ -109,8 +109,8 @@ void LaunchpadComponent::paint(juce::Graphics &g)
         for (int col = 0; col < 8; col++)
         {
             g.setColour(juce::Colours::grey);
-            int start = 10 + row * 60 + 5;
-            int end = 80 + col * 60 + 5;
+            int start = 10 + col * 60 + 5;
+            int end = 80 + row * 60 + 5;
             g.drawRect(start, end, 60, 60, 2);
             if (clicked[row][col])
                 g.setColour(juce::Colours::darkcyan);
@@ -145,9 +145,10 @@ void LaunchpadComponent::mouseDoubleClick(const MouseEvent &event)
     }
     else
     {
-        int row = (x - 15) / 60;
-        int col = (y - 85) / 60;
+        int col = (x - 15) / 60;
+        int row = (y - 85) / 60;
         clicked[row][col] = !clicked[row][col];
+        broadcaster.buttonPressed(static_cast<uint8>(row), static_cast<uint8>(col));
     }
     repaint();
 }

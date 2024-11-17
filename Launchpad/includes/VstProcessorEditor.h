@@ -8,15 +8,18 @@
 using namespace juce;
 
 class VstProcessorEditor : public juce::AudioProcessorEditor,
+                           private LaunchpadBroadcaster::Listener,
                            private juce::Timer,
                            private juce::MidiInputCallback,
                            private juce::MidiKeyboardStateListener
+
 {
 public:
     VstProcessorEditor(VstProcessor *p);
     ~VstProcessorEditor() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
+    void buttonPressed(uint8 x, uint8 y) override;
 
 private:
     void timerCallback() override;

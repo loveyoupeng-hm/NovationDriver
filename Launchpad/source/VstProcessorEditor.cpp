@@ -66,6 +66,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     addAndMakeVisible(keyboardComponent);
     keyboardState.addListener(this);
     addAndMakeVisible(launchpad);
+    launchpad.add(*this);
     addAndMakeVisible(midiMessagesBox);
     midiMessagesBox.setSize(600, 400);
     midiMessagesBox.setMultiLine(true);
@@ -92,6 +93,12 @@ VstProcessorEditor::~VstProcessorEditor()
     }
 
 }
+
+void VstProcessorEditor::buttonPressed(uint8 x, uint8 y)
+{
+    logMessage("Button Pressed " + juce::String(x) + " " + juce::String(y));
+}
+
 
 void VstProcessorEditor::timerCallback()
 {
