@@ -25,6 +25,7 @@ public:
     LightInfo(const LightType lt, MidiType mt, const uint8 n, const uint8 cl);
     juce::MidiMessage getMidi() const;
     void setColor(const uint8 cl);
+    LightInfo toFlash() const;
 
 private:
     LightType lightType;
@@ -52,6 +53,7 @@ public:
     juce::MidiMessage getLogo() const;
 
     juce::MidiMessage getGridItem(const int row, const int col) const;
+    juce::MidiMessage getGridItemFlash(const int row, const int col) const;
 
     static const bool major[12];
     static const uint8 NOTE_COLOR;

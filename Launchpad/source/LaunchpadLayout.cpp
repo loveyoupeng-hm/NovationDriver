@@ -9,6 +9,11 @@ LightInfo::LightInfo(const LightType lt, MidiType mt, const uint8 n, const uint8
 {
 }
 
+LightInfo LightInfo::toFlash() const
+{
+    return LightInfo{LightType::FLASH, midiType, note, LaunchpadLayout::NOTIFY_COLOR};
+}
+
 juce::MidiMessage LightInfo::getMidi() const
 {
     auto message = juce::MidiMessage{new uint8[9]{lead[lightType][midiType], note, color}, 3};
@@ -61,6 +66,11 @@ juce::MidiMessage LaunchpadLayout::getLogo() const
 juce::MidiMessage LaunchpadLayout::getGridItem(const int row, const int col) const
 {
     return grid[row][col].getMidi();
+}
+
+juce::MidiMessage LaunchpadLayout::getGridItemFlash(const int row, const int col) const
+{
+    return grid[row][col].toFlash().getMidi();
 }
 
 const bool LaunchpadLayout::major[12]{true, false, true, false, true, true, false, true, false, true, false, true};

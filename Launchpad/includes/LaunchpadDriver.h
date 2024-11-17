@@ -10,54 +10,17 @@ using namespace juce;
 class LaunchpadDriver : public LaunchpadLayout::LayoutListener, private juce::Timer
 {
 public:
-    LaunchpadDriver()
-    {
-        startTimer(2000);
-    }
-    ~LaunchpadDriver()
-    {
-        if (midiDevice != nullptr)
-        {
-            midiDevice->sendMessageNow(disableDAW);
-            midiDevice = nullptr;
-        }
-        stopTimer();
-    }
-    void initialize(std::unique_ptr<juce::MidiOutput> device)
-    {
-        midiDevice = std::move(device);
-        midiDevice->sendMessageNow(disableDAW);
-        midiDevice->sendMessageNow(enableDAW);
-        midiDevice->sendMessageNow(selectSessionLayout);
-        midiDevice->sendMessageNow(clearSession);
-        flashToDevice();
-    }
+    LaunchpadDriver();
 
-    void flashToDevice()
-    {
-        if (update == current)
-            return;
-        current = update;
-        for (int row = 0; row < 8; row++)
-        {
-            for (int col = 0; col < 8; col++)
-            {
-                midiDevice->sendMessageNow(layout.getGridItem(row, col));
-            }
-        }
-        for (int i = 0; i < 8; i++)
-        {
-            midiDevice->sendMessageNow(layout.getFunction(i));
-            midiDevice->sendMessageNow(layout.getScene(i));
-        }
-        midiDevice->sendMessageNow(layout.getLogo());
-    }
+    ~LaunchpadDriver();
+
+    void initialize(std::unique_ptr<juce::MidiOutput> device);
+
+    void flashToDevice();
 
 private:
-    void timerCallback() override
-    {
-        flashToDevice();
-    }
+    void timerCallback();
+    uint64 click = 0;
     std::unique_ptr<juce::MidiOutput> midiDevice;
     uint64 current = 1;
     uint64 update = 0;
