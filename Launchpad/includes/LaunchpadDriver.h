@@ -10,7 +10,10 @@ using namespace juce;
 class LaunchpadDriver : public LaunchpadLayout::LayoutListener, private juce::Timer
 {
 public:
-    LaunchpadDriver() {}
+    LaunchpadDriver()
+    {
+        startTimer(2000);
+    }
     ~LaunchpadDriver()
     {
         if (midiDevice != nullptr)
@@ -18,6 +21,7 @@ public:
             midiDevice->sendMessageNow(disableDAW);
             midiDevice = nullptr;
         }
+        stopTimer();
     }
     void initialize(std::unique_ptr<juce::MidiOutput> device)
     {
@@ -31,6 +35,9 @@ public:
 
     void flashToDevice()
     {
+        if (update == current)
+            return;
+        current = update;
         for (int row = 0; row < 8; row++)
         {
             for (int col = 0; col < 8; col++)
@@ -43,11 +50,17 @@ public:
             midiDevice->sendMessageNow(layout.getFunction(i));
             midiDevice->sendMessageNow(layout.getScene(i));
         }
+        midiDevice->sendMessageNow(layout.getLogo());
     }
 
 private:
-    void timerCallback() override {}
+    void timerCallback() override
+    {
+        flashToDevice();
+    }
     std::unique_ptr<juce::MidiOutput> midiDevice;
+    uint64 current = 1;
+    uint64 update = 0;
     LaunchpadLayout layout;
     static const uint8 enableDAWSysex[];
     static const uint8 disableDAWSysex[];

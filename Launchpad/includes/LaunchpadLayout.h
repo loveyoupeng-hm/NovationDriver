@@ -37,6 +37,11 @@ public:
         return message;
     }
 
+    void setColor(const uint8 cl)
+    {
+        color = cl;
+    }
+
 private:
     LightType lightType;
     const MidiType midiType;
@@ -55,6 +60,24 @@ public:
 
     LaunchpadLayout()
     {
+        initChomatic();
+    }
+
+    void initChomatic()
+    {
+        int start = 0;
+        for (int row = 7; row >= 8; row--)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                grid[row][col].setColor(NOTE_COLOR);
+                if ((start + col) % 12 == 0)
+                    grid[row][col].setColor(ROOT_COLOR);
+                else if (!major[(start + col) % 12])
+                    grid[row][col].setColor(OFF_COLOR);
+            }
+            start += 5;
+        }
     }
 
     juce::MidiMessage getFunction(const int index) const
@@ -67,10 +90,17 @@ public:
         return scenes[index].getMidi();
     }
 
+    juce::MidiMessage getLogo() const
+    {
+        return logo.getMidi();
+    }
+
     juce::MidiMessage getGridItem(const int row, const int col) const
     {
         return grid[row][col].getMidi();
     }
+
+    const bool major[12] = {true, false, true, false, true, true, false, true, false, true, false, true};
 
     static const uint8 NOTE_COLOR;
     static const uint8 OFF_COLOR;
@@ -92,20 +122,18 @@ public:
     static const uint8 SCENE_COLOR_5;
     static const uint8 SCENE_COLOR_6;
     static const uint8 SCENE_COLOR_7;
-
-    
-
+    static const uint8 LOGO_COLOR;
 
 private:
     void handleAsyncUpdate() override {}
     LightInfo grid[8][8] = {
-        {LightInfo{LightType::STATIC, MidiType::Note, 0x0B, ROOT_COLOR},
-         LightInfo{LightType::STATIC, MidiType::Note, 0x0C, OFF_COLOR},
+        {LightInfo{LightType::STATIC, MidiType::Note, 0x0B, NOTE_COLOR},
+         LightInfo{LightType::STATIC, MidiType::Note, 0x0C, NOTE_COLOR},
          LightInfo{LightType::STATIC, MidiType::Note, 0x0D, NOTE_COLOR},
-         LightInfo{LightType::STATIC, MidiType::Note, 0x0E, OFF_COLOR},
+         LightInfo{LightType::STATIC, MidiType::Note, 0x0E, NOTE_COLOR},
          LightInfo{LightType::STATIC, MidiType::Note, 0x0F, NOTE_COLOR},
          LightInfo{LightType::STATIC, MidiType::Note, 0x10, NOTE_COLOR},
-         LightInfo{LightType::STATIC, MidiType::Note, 0x11, OFF_COLOR},
+         LightInfo{LightType::STATIC, MidiType::Note, 0x11, NOTE_COLOR},
          LightInfo{LightType::STATIC, MidiType::Note, 0x12, NOTE_COLOR}},
         {LightInfo{LightType::STATIC, MidiType::Note, 0x15, NOTE_COLOR},
          LightInfo{LightType::STATIC, MidiType::Note, 0x16, NOTE_COLOR},
@@ -175,6 +203,7 @@ private:
             LightInfo{LightType::STATIC, MidiType::CC, 0x60, DRUMES_COLOR},
             LightInfo{LightType::STATIC, MidiType::CC, 0x61, KEYS_COLOR},
             LightInfo{LightType::STATIC, MidiType::CC, 0x62, USER_COLOR}};
+    LightInfo logo{LightType::STATIC, MidiType::CC, 0x63, LOGO_COLOR};
     LightInfo scenes[8] =
         {
             LightInfo{LightType::STATIC, MidiType::CC, 0x59, SCENE_COLOR_0},
