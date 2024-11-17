@@ -96,9 +96,12 @@ VstProcessorEditor::~VstProcessorEditor()
 
 void VstProcessorEditor::buttonPressed(uint8 x, uint8 y)
 {
-    logMessage("Button Pressed " + juce::String(x) + " " + juce::String(y));
+    logMessage("Button Pressed " + juce::String(x) + ", " + juce::String(y));
 }
 
+void VstProcessorEditor::scenePressed(uint8 scene) { 
+    logMessage("Scene Pressed " + juce::String(scene)); 
+}
 
 void VstProcessorEditor::timerCallback()
 {

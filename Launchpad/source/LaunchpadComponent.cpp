@@ -137,11 +137,13 @@ void LaunchpadComponent::mouseDown(const MouseEvent &event)
     {
         int col = (x - 15) / 60;
         upclicked[col] = !upclicked[col];
+        broadcaster.upperPressed(col);
     }
     else if (x >= 10 + 7 * 60 + 5 + 60 + 10)
     {
         int row = (y - 85) / 60;
         rightclicked[row] = !rightclicked[row];
+        broadcaster.rightPressed(row);
     }
     else
     {

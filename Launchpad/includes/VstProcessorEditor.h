@@ -20,7 +20,7 @@ public:
     void paint(juce::Graphics &g) override;
     void resized() override;
     void buttonPressed(uint8 x, uint8 y) override;
-
+    void scenePressed(uint8 scene) override;
 private:
     void timerCallback() override;
     void logMessage(const juce::String m);
