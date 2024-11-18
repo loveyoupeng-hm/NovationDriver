@@ -73,6 +73,13 @@ juce::MidiMessage LaunchpadLayout::getGridItemFlash(const int row, const int col
     return grid[row][col].toFlash().getMidi();
 }
 
+int LaunchpadLayout::majorMap(const int pitch)
+{
+    const int row = (pitch / 10) - 1;
+    const int col = (pitch % 10) - 1;
+    return 36 + 5 * row + col;
+}
+
 const bool LaunchpadLayout::major[12]{true, false, true, false, true, true, false, true, false, true, false, true};
 const uint8 LaunchpadLayout::NOTE_COLOR = 0x02;
 const uint8 LaunchpadLayout::OFF_COLOR = 0x00;

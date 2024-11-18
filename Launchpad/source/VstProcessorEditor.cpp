@@ -29,7 +29,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     // find the first enabled device and use that by default
     for (auto input : midiInputs)
     {
-        if (deviceManager.isMidiInputDeviceEnabled(input.identifier))
+        if (processor->getDeviceManager()->isMidiInputDeviceEnabled(input.identifier))
         {
             setMidiInput(midiInputs.indexOf(input));
             break;
@@ -62,8 +62,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
 VstProcessorEditor::~VstProcessorEditor()
 {
     keyboardState.removeListener(this);
-    deviceManager.removeMidiInputDeviceCallback(juce::MidiInput::getAvailableDevices()[midiInputList.getSelectedItemIndex()].identifier, this);
-    
+    processor->getDeviceManager()->removeMidiInputDeviceCallback(juce::MidiInput::getAvailableDevices()[midiInputList.getSelectedItemIndex()].identifier, this);
 }
 
 void VstProcessorEditor::buttonPressed(uint8 x, uint8 y)
@@ -145,16 +144,11 @@ void VstProcessorEditor::setMidiInput(int index)
 
     for (auto newInput : list)
     {
-        deviceManager.removeMidiInputDeviceCallback(newInput.identifier, this);
-        if (!deviceManager.isMidiInputDeviceEnabled(newInput.identifier))
-            deviceManager.setMidiInputDeviceEnabled(newInput.identifier, true);
-        deviceManager.addMidiInputDeviceCallback(newInput.identifier, this);
+        processor->getDeviceManager()->removeMidiInputDeviceCallback(newInput.identifier, this);
+        if (!processor->getDeviceManager()->isMidiInputDeviceEnabled(newInput.identifier))
+            processor->getDeviceManager()->setMidiInputDeviceEnabled(newInput.identifier, true);
+        processor->getDeviceManager()->addMidiInputDeviceCallback(newInput.identifier, this);
         midiInputList.setSelectedId(index + 1, juce::dontSendNotification);
-
-        if (newInput.name.equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA"))
-        {
-            driver.initialize(juce::MidiOutput::openDevice(newInput.identifier));
-        }
     }
 
     lastInputIndex = index;
@@ -164,8 +158,13 @@ void VstProcessorEditor::setMidiInput(int index)
 void VstProcessorEditor::handleIncomingMidiMessage(juce::MidiInput *source, const juce::MidiMessage &message)
 {
     const juce::ScopedValueSetter<bool> scopedInputFlag(isAddingFromMidiInput, true);
-    keyboardState.processNextMidiEvent(message);
-    postMessageToList(message, source->getName());
+    int note = message.getNoteNumber();
+    if (source->getName().equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA"))
+        note = processor->getDriver()->processMidiPitch(note);
+    auto msg = juce::MidiMessage(message);
+    msg.setNoteNumber(note);
+    keyboardState.processNextMidiEvent(msg);
+    postMessageToList(msg, source->getName());
 }
 
 void VstProcessorEditor::handleNoteOn(juce::MidiKeyboardState *, int midiChannel, int midiNoteNumber, float velocity)

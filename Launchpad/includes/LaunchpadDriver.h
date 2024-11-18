@@ -18,6 +18,8 @@ public:
 
     void flashToDevice();
 
+    int processMidiPitch(const int pitch) const;
+
 private:
     void timerCallback();
     uint64 click = 0;

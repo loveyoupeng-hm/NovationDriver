@@ -32,6 +32,12 @@ LaunchpadDriver::~LaunchpadDriver()
     }
     stopTimer();
 }
+
+int LaunchpadDriver::processMidiPitch(const int pitch) const
+{
+    return layout.pitchMap(pitch);
+}
+
 void LaunchpadDriver::initialize(std::unique_ptr<juce::MidiOutput> device)
 {
     midiDevice = std::move(device);

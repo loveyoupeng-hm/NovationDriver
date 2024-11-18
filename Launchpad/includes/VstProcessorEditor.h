@@ -56,7 +56,6 @@ private:
     void addMessageToList(const juce::MidiMessage &message, const juce::String &source);
 
     //==============================================================================
-    juce::AudioDeviceManager deviceManager; // [1]
     juce::ComboBox midiInputList;           // [2]
     juce::Label midiInputListLabel;
     int lastInputIndex = 0;             // [3]
@@ -64,7 +63,6 @@ private:
 
     juce::MidiKeyboardState keyboardState;         // [5]
     juce::MidiKeyboardComponent keyboardComponent; // [6]
-    LaunchpadDriver driver;
     juce::TextEditor midiMessagesBox;
     double startTime;
     VstProcessor *processor;

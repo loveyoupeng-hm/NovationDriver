@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 
@@ -54,6 +55,7 @@ public:
 
     juce::MidiMessage getGridItem(const int row, const int col) const;
     juce::MidiMessage getGridItemFlash(const int row, const int col) const;
+    std::function<int(const int)> pitchMap{&LaunchpadLayout::majorMap};
 
     static const bool major[12];
     static const uint8 NOTE_COLOR;
@@ -80,6 +82,7 @@ public:
 
 private:
     void handleAsyncUpdate() override {}
+    static int majorMap(const int pitch);
     LightInfo grid[8][8] = {
         {LightInfo{LightType::STATIC, MidiType::Note, 0x0B, NOTE_COLOR},
          LightInfo{LightType::STATIC, MidiType::Note, 0x0C, NOTE_COLOR},

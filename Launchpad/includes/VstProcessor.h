@@ -51,23 +51,25 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_dsp/juce_dsp.h>
 #include <atomic>
+#include "LaunchpadDriver.h"
+
 class VstProcessorEditor;
 
 using namespace juce;
 
 //==============================================================================
-class VstProcessor : public juce::AudioProcessor
+class VstProcessor : public juce::AudioProcessor, private juce::MidiInputCallback
 {
 public:
   //==============================================================================
   VstProcessor();
+  virtual ~VstProcessor() override;
 
   //==============================================================================
   void prepareToPlay(double sampleRate, int samplesPerBlock) override;
   void releaseResources() override {}
   void processBlock(AudioBuffer<double> &, MidiBuffer &) override {}
   void processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi) override;
-
 
   //==============================================================================
   bool isMidiEffect() const override { return true; }
@@ -91,24 +93,32 @@ public:
   void changeProgramName(int, const String &) override {}
   AudioProcessorEditor *createEditor();
 
-  float getBpm() { return bpm;}
+  float getBpm() { return bpm; }
 
   //==============================================================================
   void getStateInformation(MemoryBlock &) override {}
 
   void setStateInformation(const void *, int) override {}
 
+  juce::AudioDeviceManager *getDeviceManager();
+  LaunchpadDriver *getDriver();
+
 private:
   //==============================================================================
+  void handleIncomingMidiMessage(juce::MidiInput *source, const juce::MidiMessage &message) override;
+  void initHandler();
 
   //==============================================================================
 
+  LaunchpadDriver driver;
   void updateBpm();
   std::atomic<float> bpm{100.0f};
   VstProcessorEditor *editor;
-  SortedSet<int> notes;
   int currentNote, lastNoteValue;
- int time;
-    float rate;
+  int time;
+  float rate;
+  MidiBuffer notes;
+  std::atomic<bool> sessionMode{true};
+  juce::AudioDeviceManager *deviceManager{nullptr}; // [1]
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VstProcessor)
 };
