@@ -110,7 +110,7 @@ private:
 
   //==============================================================================
 
-  LaunchpadDriver driver;
+  LaunchpadDriver *driver{nullptr};
   void updateBpm();
   std::atomic<float> bpm{100.0f};
   VstProcessorEditor *editor;
@@ -118,7 +118,7 @@ private:
   int time;
   float rate;
   MidiBuffer notes;
-  std::atomic<bool> sessionMode{true};
+  std::atomic<bool> sessionMode{false};
   juce::AudioDeviceManager *deviceManager{nullptr}; // [1]
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VstProcessor)
 };

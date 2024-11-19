@@ -2,6 +2,7 @@
 
 LaunchpadComponent::LaunchpadComponent()
 {
+    broadcaster = new LaunchpadBroadcaster(); 
     auto area = getLocalBounds();
     setSize(area.getWidth(), area.getWidth());
     for (int row = 0; row < 8; row++)
@@ -13,6 +14,13 @@ LaunchpadComponent::LaunchpadComponent()
         upclicked[row] = false;
         rightclicked[row] = false;
     }
+}
+
+LaunchpadComponent::~LaunchpadComponent()
+{
+    if(broadcaster != nullptr)
+        delete broadcaster;
+    broadcaster = nullptr;
 }
 
 void LaunchpadComponent::paint(juce::Graphics &g)
@@ -137,20 +145,20 @@ void LaunchpadComponent::mouseDown(const MouseEvent &event)
     {
         int col = (x - 15) / 60;
         upclicked[col] = !upclicked[col];
-        broadcaster.upperPressed(col);
+        broadcaster->upperPressed(col);
     }
     else if (x >= 10 + 7 * 60 + 5 + 60 + 10)
     {
         int row = (y - 85) / 60;
         rightclicked[row] = !rightclicked[row];
-        broadcaster.rightPressed(row);
+        broadcaster->rightPressed(row);
     }
     else
     {
         int col = (x - 15) / 60;
         int row = (y - 85) / 60;
         clicked[row][col] = !clicked[row][col];
-        broadcaster.buttonPressed(static_cast<uint8>(row), static_cast<uint8>(col));
+        broadcaster->buttonPressed(static_cast<uint8>(row), static_cast<uint8>(col));
     }
     repaint();
 }

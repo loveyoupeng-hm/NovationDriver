@@ -13,17 +13,24 @@ VstProcessor::~VstProcessor()
   if (deviceManager != nullptr)
     delete deviceManager;
   deviceManager = nullptr;
+  if (driver != nullptr)
+    delete driver;
+  driver = nullptr;
 }
 
 void VstProcessor::initHandler()
 {
+  if (driver != nullptr)
+    return;
+  sessionMode = true;
+  driver = new LaunchpadDriver();
   auto list = juce::MidiInput::getAvailableDevices();
   deviceManager = new juce::AudioDeviceManager();
   for (auto newInput : list)
   {
     if (newInput.name.equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA"))
     {
-      driver.initialize(juce::MidiOutput::openDevice(newInput.identifier));
+      driver->initialize(juce::MidiOutput::openDevice(newInput.identifier));
       deviceManager->removeMidiInputDeviceCallback(newInput.identifier, this);
       if (!deviceManager->isMidiInputDeviceEnabled(newInput.identifier))
         deviceManager->setMidiInputDeviceEnabled(newInput.identifier, true);
@@ -43,7 +50,7 @@ void VstProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 
 LaunchpadDriver *VstProcessor::getDriver()
 {
-  return &driver;
+  return driver;
 }
 
 void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
@@ -64,7 +71,7 @@ void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
     {
       auto msg = metadata.getMessage();
       int note = msg.getNoteNumber();
-      note = driver.processMidiPitch(note);
+      note = driver->processMidiPitch(note);
       auto copy = juce::MidiMessage(msg);
       copy.setNoteNumber(note);
       notes.addEvent(copy, metadata.samplePosition);
@@ -136,6 +143,7 @@ void VstProcessor::updateBpm()
 
 AudioProcessorEditor *VstProcessor::createEditor()
 {
+  std::cout<< "in processor init editor" << std::endl;
   initHandler();
   editor = new VstProcessorEditor(this);
   return editor;
