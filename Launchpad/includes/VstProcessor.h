@@ -59,6 +59,7 @@ using namespace juce;
 
 //==============================================================================
 class VstProcessor : public juce::AudioProcessor, private juce::MidiInputCallback
+,private juce::Timer
 {
 public:
   //==============================================================================
@@ -106,7 +107,7 @@ public:
 private:
   //==============================================================================
   void handleIncomingMidiMessage(juce::MidiInput *source, const juce::MidiMessage &message) override;
-  void initHandler();
+  void timerCallback()override;
 
   //==============================================================================
 
