@@ -3,19 +3,6 @@
 void LaunchpadDriver::timerCallback()
 {
     flashToDevice();
-
-    if ((++click) % 100 == 0)
-    {
-        midiDevice->sendMessageNow(layout.getGridItemFlash(0, 2));
-        midiDevice->sendMessageNow(layout.getGridItemFlash(0, 1));
-        midiDevice->sendMessageNow(layout.getGridItemFlash(0, 0));
-    }
-    if (click % 100 == 10)
-    {
-        midiDevice->sendMessageNow(layout.getGridItem(0, 2));
-        midiDevice->sendMessageNow(layout.getGridItem(0, 1));
-        midiDevice->sendMessageNow(layout.getGridItem(0, 0));
-    }
 }
 
 LaunchpadDriver::LaunchpadDriver()
@@ -50,7 +37,7 @@ void LaunchpadDriver::initialize(std::unique_ptr<juce::MidiOutput> device)
 
 void LaunchpadDriver::flashToDevice()
 {
-    if (update == current)
+    if (update == current || midiDevice == nullptr)
         return;
     current = update;
     for (int row = 0; row < 8; row++)
@@ -66,6 +53,18 @@ void LaunchpadDriver::flashToDevice()
         midiDevice->sendMessageNow(layout.getScene(i));
     }
     midiDevice->sendMessageNow(layout.getLogo());
+    if ((++click) % 100 == 0)
+    {
+        midiDevice->sendMessageNow(layout.getGridItemFlash(0, 2));
+        midiDevice->sendMessageNow(layout.getGridItemFlash(0, 1));
+        midiDevice->sendMessageNow(layout.getGridItemFlash(0, 0));
+    }
+    if (click % 100 == 10)
+    {
+        midiDevice->sendMessageNow(layout.getGridItem(0, 2));
+        midiDevice->sendMessageNow(layout.getGridItem(0, 1));
+        midiDevice->sendMessageNow(layout.getGridItem(0, 0));
+    }
 }
 
 const uint8 LaunchpadDriver::enableDAWSysex[] = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x10, 0x01, 0xF7};
