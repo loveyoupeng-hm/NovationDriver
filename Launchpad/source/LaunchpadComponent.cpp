@@ -2,7 +2,7 @@
 
 LaunchpadComponent::LaunchpadComponent()
 {
-    broadcaster = new LaunchpadBroadcaster(); 
+    broadcaster = new LaunchpadBroadcaster();
     auto area = getLocalBounds();
     setSize(area.getWidth(), area.getWidth());
     for (int row = 0; row < 8; row++)
@@ -14,11 +14,12 @@ LaunchpadComponent::LaunchpadComponent()
         upclicked[row] = false;
         rightclicked[row] = false;
     }
+    this->setRepaintsOnMouseActivity(true);
 }
 
 LaunchpadComponent::~LaunchpadComponent()
 {
-    if(broadcaster != nullptr)
+    if (broadcaster != nullptr)
         delete broadcaster;
     broadcaster = nullptr;
 }
@@ -92,14 +93,14 @@ void LaunchpadComponent::paint(juce::Graphics &g)
             g.setColour(juce::Colours::grey);
 
         int start = 10 + 7 * 60 + 5 + 60 + 10;
-        int end = 80 + i * 60 + 5;
+        int end = 80 + (7 - i) * 60 + 5;
         g.drawRect(start, end, 60, 60, 2);
         g.setColour(juce::Colours::black);
         if (rightclicked[i])
             g.setColour(juce::Colours::lightcoral);
         else
             g.setColour(juce::Colours::grey);
-        if (i < 7)
+        if ((7 - i) < 7)
         {
             g.drawLine(start + 25, end + 25, start + 35, end + 30, 2);
             g.drawLine(start + 25, end + 35, start + 35, end + 30, 2);
@@ -118,7 +119,7 @@ void LaunchpadComponent::paint(juce::Graphics &g)
         {
             g.setColour(juce::Colours::grey);
             int start = 10 + col * 60 + 5;
-            int end = 80 + row * 60 + 5;
+            int end = 80 + (7 - row) * 60 + 5;
             g.drawRect(start, end, 60, 60, 2);
             if (clicked[row][col])
                 g.setColour(juce::Colours::darkcyan);
@@ -149,16 +150,15 @@ void LaunchpadComponent::mouseDown(const MouseEvent &event)
     }
     else if (x >= 10 + 7 * 60 + 5 + 60 + 10)
     {
-        int row = (y - 85) / 60;
+        int row = 7 - (y - 85) / 60;
         rightclicked[row] = !rightclicked[row];
         broadcaster->rightPressed(row);
     }
     else
     {
-        int col = (x - 15) / 60;
-        int row = (y - 85) / 60;
+        int col = ((x - 15) / 60);
+        int row = 7 - (y - 85) / 60;
         clicked[row][col] = !clicked[row][col];
         broadcaster->buttonPressed(static_cast<uint8>(row), static_cast<uint8>(col));
     }
-    repaint();
 }
