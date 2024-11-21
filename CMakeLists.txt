@@ -11,6 +11,8 @@ set(CPM_SOURCE_CACHE ${LIB_DIR}/cpm)
 
 include(cmake/cpm.cmake)
 
+find_package(Threads REQUIRED)
+
 CPMAddPackage(
     NAME JUCE
     GITHUB_REPOSITORY juce-framework/JUCE
