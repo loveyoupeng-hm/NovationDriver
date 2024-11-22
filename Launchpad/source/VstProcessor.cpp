@@ -18,9 +18,8 @@ VstProcessor::~VstProcessor()
   driver = nullptr;
 }
 
-void VstProcessor::timerCallback()
+void VstProcessor::initialize()
 {
-  stopTimer();
   if (driver != nullptr)
     return;
   sessionMode = true;
@@ -43,7 +42,7 @@ void VstProcessor::timerCallback()
 void VstProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
   ignoreUnused(samplesPerBlock);
-  startTimer(500);
+  initialize();
   notes.clear();
   lastNoteValue = -1;
   time = 0;
@@ -145,7 +144,7 @@ void VstProcessor::updateBpm()
 
 AudioProcessorEditor *VstProcessor::createEditor()
 {
-  timerCallback();
+  initialize();
   editor = new VstProcessorEditor(this);
   return editor;
 }
