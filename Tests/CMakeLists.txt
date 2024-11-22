@@ -1,8 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
-
 project(Tests)
-
-enable_testing()
 
 function(add_test_case NAME LIBS ...)
     add_executable(${NAME} ${NAME}.cpp)
@@ -22,4 +18,4 @@ function(add_test_case NAME LIBS ...)
     add_test(${NAME} ${NAME})
 endfunction()
 
-add_test_case(test juce::juce_dsp atomic)
+add_test_case(SimpleTests juce::juce_dsp atomic)

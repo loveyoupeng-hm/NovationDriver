@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.31)
 
 project(NovationDriver)
 
@@ -33,8 +33,9 @@ CPMAddPackage(
 )
 
 add_compile_options(-Wall -Wextra -Wpedantic)
-
 include_directories(includes)
 
 add_subdirectory(Launchpad)
+
+enable_testing()
 add_subdirectory(Tests)

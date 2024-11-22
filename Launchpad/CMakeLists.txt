@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.31)
-
 project(Launchpad VERSION ${PROJECT_VERSION})
 
 juce_add_plugin(
