@@ -30,7 +30,9 @@ void VstProcessor::initialize()
   {
     if (newInput.name.equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA"))
     {
-      driver->initialize(juce::MidiOutput::openDevice(newInput.identifier));
+      auto output = juce::MidiOutput::openDevice(newInput.identifier);
+      if (output)
+        driver->initialize(std::move(output));
       deviceManager->removeMidiInputDeviceCallback(newInput.identifier, this);
       if (!deviceManager->isMidiInputDeviceEnabled(newInput.identifier))
         deviceManager->setMidiInputDeviceEnabled(newInput.identifier, true);
@@ -91,7 +93,7 @@ void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
 
   // get note duration
   // 60.0 / bpm * 0.5
-  
+
   auto noteDuration = static_cast<int>(std::ceil(juce::jmap(60.0f / bpm * 0.5f, 0.0f, 1.0f, 0.f, rate)));
 
   if (play && (time + numSamples) >= noteDuration)
@@ -147,7 +149,7 @@ void VstProcessor::updatePlayHead()
       bpm = static_cast<float>(*(position->getBpm()));
       if (bpm < 0.1)
         bpm = 100.0f;
-      
+
       play = position->getIsPlaying();
     }
   }
