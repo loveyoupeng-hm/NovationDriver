@@ -43,10 +43,17 @@ void VstProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
   ignoreUnused(samplesPerBlock);
   initialize();
-  notes.clear();
+  midiNotes.clear();
   lastNoteValue = -1;
   time = 0;
   rate = static_cast<float>(sampleRate);
+  numSamples = samplesPerBlock;
+  currentNote = 0;
+  notes.clear();
+  notes.push_back(48);
+  notes.push_back(48 + 2 + 2);
+  notes.push_back(48 + 2 + 2 + 1 + 2);
+  notes.push_back(48 + 12);
 }
 
 LaunchpadDriver *VstProcessor::getDriver()
@@ -56,7 +63,7 @@ LaunchpadDriver *VstProcessor::getDriver()
 
 void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
 {
-  updateBpm();
+  updatePlayHead();
 
   juce::ignoreUnused(buffer);
   juce::ignoreUnused(midi);
@@ -67,7 +74,7 @@ void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
   // auto numSamples = buffer.getNumSamples();
   if (sessionMode.load())
   {
-    notes.clear();
+    midiNotes.clear();
     for (const auto metadata : midi)
     {
       auto msg = metadata.getMessage();
@@ -75,37 +82,39 @@ void VstProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midi)
       note = driver->processMidiPitch(note);
       auto copy = juce::MidiMessage(msg);
       copy.setNoteNumber(note);
-      notes.addEvent(copy, metadata.samplePosition);
+      midiNotes.addEvent(copy, metadata.samplePosition);
     }
 
     midi.clear();
-    midi.swapWith(notes);
+    midi.swapWith(midiNotes);
   }
 
   // get note duration
-  // auto noteDuration = static_cast<int>(std::ceil(rate * 0.25f * (0.1f + (1.0f - juce::jmap(bpm.load(), 0.0f, 200.0f, 0.0f, 0.1f)))));
+  // 60.0 / bpm * 0.5
+  
+  auto noteDuration = static_cast<int>(std::ceil(juce::jmap(60.0f / bpm * 0.5f, 0.0f, 1.0f, 0.f, rate)));
 
-  // if ((time + numSamples) >= noteDuration)
-  // {
-  //   auto offset = jmax(0, jmin((int)(noteDuration - time), numSamples -
-  //                                                              1));
+  if (play && (time + numSamples) >= noteDuration)
+  {
+    auto offset = jmax(0, jmin((int)(noteDuration - time), numSamples -
+                                                               1));
 
-  //   if (lastNoteValue > 0)
-  //   {
-  //     midi.addEvent(MidiMessage::noteOff(1, lastNoteValue), offset);
-  //     lastNoteValue = -1;
-  //   }
+    if (lastNoteValue > 0)
+    {
+      midi.addEvent(MidiMessage::noteOff(1, lastNoteValue), offset);
+      lastNoteValue = -1;
+    }
 
-  //   if (notes.size() > 0)
-  //   {
-  //     currentNote %= notes.size();
-  //     lastNoteValue = notes[currentNote++];
-  //     midi.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127),
-  //                   offset);
-  //   }
-  // }
+    if (notes.size() > 0)
+    {
+      currentNote %= static_cast<int>(notes.size());
+      lastNoteValue = notes[static_cast<size_t>(currentNote++)];
+      midi.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127),
+                    offset);
+    }
+  }
 
-  // time = (time + numSamples) % noteDuration;
+  time = (time + numSamples) % noteDuration;
 }
 
 juce::AudioDeviceManager *VstProcessor::getDeviceManager()
@@ -127,7 +136,7 @@ void VstProcessor::handleIncomingMidiMessage(juce::MidiInput *source, const juce
   }
 }
 
-void VstProcessor::updateBpm()
+void VstProcessor::updatePlayHead()
 {
   auto *head = getPlayHead();
   if (head != nullptr)
@@ -138,6 +147,8 @@ void VstProcessor::updateBpm()
       bpm = static_cast<float>(*(position->getBpm()));
       if (bpm < 0.1)
         bpm = 100.0f;
+      
+      play = position->getIsPlaying();
     }
   }
 }
