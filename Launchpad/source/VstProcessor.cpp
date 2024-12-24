@@ -28,7 +28,7 @@ void VstProcessor::initialize()
   deviceManager = new juce::AudioDeviceManager();
   for (auto newInput : list)
   {
-    if (newInput.name.equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA"))
+    if (newInput.name.equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA") || newInput.name.equalsIgnoreCase("LPMiniMK3 MIDI"))
     {
       auto output = juce::MidiOutput::openDevice(newInput.identifier);
       if (output)
@@ -146,7 +146,7 @@ void VstProcessor::updatePlayHead()
     auto position = head->getPosition();
     if (position.hasValue())
     {
-      bpm = static_cast<float>(*(position->getBpm()));
+      //bpm = static_cast<float>(*(position->getBpm()));
       if (bpm < 0.1)
         bpm = 100.0f;
 

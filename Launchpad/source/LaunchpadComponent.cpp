@@ -35,9 +35,11 @@ void LaunchpadComponent::paint(juce::Graphics &g)
         else
             g.setColour(juce::Colours::grey);
 
-        int start = 10 + i * 60 + 5;
-        int end = 10 + 5;
-        g.drawRect(start, end, 60, 60, 2);
+        int start_i = 10 + i * 60 + 5;
+        int end_i = 10 + 5;
+        float start = static_cast<float>(start_i);
+        float end = static_cast<float>(end_i);
+        g.drawRect(start_i, end_i, 60, 60, 2);
         g.setColour(juce::Colours::black);
         Path path;
         if (upclicked[i])
@@ -69,16 +71,16 @@ void LaunchpadComponent::paint(juce::Graphics &g)
         switch (i)
         {
         case 4:
-            g.drawText("Session", start + 2, end + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
+            g.drawText("Session", start_i + 2, end_i + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
             break;
         case 5:
-            g.drawText("Drums", start + 2, end + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
+            g.drawText("Drums", start_i + 2, end_i + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
             break;
         case 6:
-            g.drawText("Keys", start + 2, end + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
+            g.drawText("Keys", start_i + 2, end_i + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
             break;
         case 7:
-            g.drawText("User", start + 2, end + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
+            g.drawText("User", start_i + 2, end_i + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
             break;
         default:
             break;
@@ -92,9 +94,11 @@ void LaunchpadComponent::paint(juce::Graphics &g)
         else
             g.setColour(juce::Colours::grey);
 
-        int start = 10 + 7 * 60 + 5 + 60 + 10;
-        int end = 80 + (7 - i) * 60 + 5;
-        g.drawRect(start, end, 60, 60, 2);
+        int start_i = 10 + 7 * 60 + 5 + 60 + 10;
+        int end_i = 80 + (7 - i) * 60 + 5;
+        float start = static_cast<float>(start_i);
+        float end = static_cast<float>(end_i);
+        g.drawRect(start_i, end_i, 60, 60, 2);
         g.setColour(juce::Colours::black);
         if (rightclicked[i])
             g.setColour(juce::Colours::lightcoral);
@@ -107,9 +111,9 @@ void LaunchpadComponent::paint(juce::Graphics &g)
         }
         else
         {
-            g.drawText("Stop", start + 2, end + 12, 60 - 4, 60 - 4, juce::Justification::centredTop, true);
-            g.drawText("Solo", start + 2, end + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
-            g.drawText("Mute", start + 2, end + 2, 60 - 4, 50 - 4, juce::Justification::centredBottom, true);
+            g.drawText("Stop", start_i + 2, end_i + 12, 60 - 4, 60 - 4, juce::Justification::centredTop, true);
+            g.drawText("Solo", start_i + 2, end_i + 2, 60 - 4, 60 - 4, juce::Justification::centred, true);
+            g.drawText("Mute", start_i + 2, end_i + 2, 60 - 4, 50 - 4, juce::Justification::centredBottom, true);
         }
     }
 
@@ -144,21 +148,21 @@ void LaunchpadComponent::mouseDown(const MouseEvent &event)
 
     if (y <= 15 + 60)
     {
-        int col = (x - 15) / 60;
+        uint8 col = static_cast<uint8>((x - 15) / 60);
         upclicked[col] = !upclicked[col];
         broadcaster->upperPressed(col);
     }
     else if (x >= 10 + 7 * 60 + 5 + 60 + 10)
     {
-        int row = 7 - (y - 85) / 60;
+        uint8 row = static_cast<uint8>(7 - (y - 85) / 60);
         rightclicked[row] = !rightclicked[row];
         broadcaster->rightPressed(row);
     }
     else
     {
-        int col = ((x - 15) / 60);
-        int row = 7 - (y - 85) / 60;
+        uint8 col = static_cast<uint8>((x - 15) / 60);
+        uint8 row = static_cast<uint8>(7 - (y - 85) / 60);
         clicked[row][col] = !clicked[row][col];
-        broadcaster->buttonPressed(static_cast<uint8>(row), static_cast<uint8>(col));
+        broadcaster->buttonPressed(row, col);
     }
 }

@@ -65,7 +65,7 @@ private:
     juce::MidiKeyboardComponent keyboardComponent; // [6]
     juce::TextEditor midiMessagesBox;
     double startTime;
-    VstProcessor *processor;
+    VstProcessor *_processor;
     LaunchpadComponent launchpad;
 
     //==============================================================================

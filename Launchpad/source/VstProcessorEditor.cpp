@@ -4,7 +4,7 @@ using namespace juce;
 VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     : AudioProcessorEditor(p),
       keyboardComponent(keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard),
-      startTime(juce::Time::getMillisecondCounterHiRes() * 0.001), processor{p}
+      startTime(juce::Time::getMillisecondCounterHiRes() * 0.001), _processor{p}
 {
     startTimer(2000);
     setOpaque(true);
@@ -29,7 +29,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
     // find the first enabled device and use that by default
     for (auto input : midiInputs)
     {
-        if (processor->getDeviceManager()->isMidiInputDeviceEnabled(input.identifier))
+        if (_processor->getDeviceManager()->isMidiInputDeviceEnabled(input.identifier))
         {
             setMidiInput(midiInputs.indexOf(input));
             break;
@@ -62,7 +62,7 @@ VstProcessorEditor::VstProcessorEditor(VstProcessor *p)
 VstProcessorEditor::~VstProcessorEditor()
 {
     keyboardState.removeListener(this);
-    processor->getDeviceManager()->removeMidiInputDeviceCallback(juce::MidiInput::getAvailableDevices()[midiInputList.getSelectedItemIndex()].identifier, this);
+    _processor->getDeviceManager()->removeMidiInputDeviceCallback(juce::MidiInput::getAvailableDevices()[midiInputList.getSelectedItemIndex()].identifier, this);
 }
 
 void VstProcessorEditor::buttonPressed(uint8 x, uint8 y)
@@ -77,7 +77,7 @@ void VstProcessorEditor::scenePressed(uint8 scene)
 
 void VstProcessorEditor::timerCallback()
 {
-    logMessage(processor->getName() + " " + juce::String(processor->getBpm()));
+    logMessage(_processor->getName() + " " + juce::String(_processor->getBpm()));
 }
 
 void VstProcessorEditor::paint(juce::Graphics &g)
@@ -144,10 +144,10 @@ void VstProcessorEditor::setMidiInput(int index)
 
     for (auto newInput : list)
     {
-        processor->getDeviceManager()->removeMidiInputDeviceCallback(newInput.identifier, this);
-        if (!processor->getDeviceManager()->isMidiInputDeviceEnabled(newInput.identifier))
-            processor->getDeviceManager()->setMidiInputDeviceEnabled(newInput.identifier, true);
-        processor->getDeviceManager()->addMidiInputDeviceCallback(newInput.identifier, this);
+        _processor->getDeviceManager()->removeMidiInputDeviceCallback(newInput.identifier, this);
+        if (!_processor->getDeviceManager()->isMidiInputDeviceEnabled(newInput.identifier))
+            _processor->getDeviceManager()->setMidiInputDeviceEnabled(newInput.identifier, true);
+        _processor->getDeviceManager()->addMidiInputDeviceCallback(newInput.identifier, this);
         midiInputList.setSelectedId(index + 1, juce::dontSendNotification);
     }
 
@@ -160,7 +160,7 @@ void VstProcessorEditor::handleIncomingMidiMessage(juce::MidiInput *source, cons
     const juce::ScopedValueSetter<bool> scopedInputFlag(isAddingFromMidiInput, true);
     int note = message.getNoteNumber();
     if (source->getName().equalsIgnoreCase("Launchpad Mini MK3 LPMiniMK3 DA"))
-        note = processor->getDriver()->processMidiPitch(note);
+        note = _processor->getDriver()->processMidiPitch(note);
     auto msg = juce::MidiMessage(message);
     msg.setNoteNumber(note);
     keyboardState.processNextMidiEvent(msg);

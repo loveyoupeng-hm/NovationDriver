@@ -32,7 +32,7 @@ CPMAddPackage(
 
 )
 
-add_compile_options(-Wall -Wextra -Wpedantic)
+# add_compile_options(-Wall -Wextra -Wpedantic)
 include_directories(includes)
 
 add_subdirectory(Launchpad)

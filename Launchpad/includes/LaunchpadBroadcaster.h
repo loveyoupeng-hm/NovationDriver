@@ -16,16 +16,16 @@ public:
         {
             juce::ignoreUnused(x);
             juce::ignoreUnused(y);
-        };
-        virtual void upPressed() {};
-        virtual void downPressed() {};
-        virtual void leftPressed() {};
-        virtual void rightPressed() {};
-        virtual void sessionPressed() {};
-        virtual void drumsPressed() {};
-        virtual void keysPressed() {};
-        virtual void userPressed() {};
-        virtual void scenePressed(uint8 scene) { juce::ignoreUnused(scene); };
+        }
+        virtual void upPressed() {}
+        virtual void downPressed() {}
+        virtual void leftPressed() {}
+        virtual void rightPressed() {}
+        virtual void sessionPressed() {}
+        virtual void drumsPressed() {}
+        virtual void keysPressed() {}
+        virtual void userPressed() {}
+        virtual void scenePressed(uint8 scene) { juce::ignoreUnused(scene); }
     };
 
     void addListener(Listener &callback);

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <juce_dsp/juce_dsp.h>
 #include <atomic>
+#define M_PI 3.14159265358979323846
 #include <cmath>
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -57,7 +58,7 @@ namespace test_plugins
     TEST(Cpp, sin)
     {
         EXPECT_DOUBLE_EQ(0.0, std::sin(0));
-        EXPECT_DOUBLE_EQ(1.0, std::sin(0.5 * std::numbers::pi));
+        EXPECT_DOUBLE_EQ(1.0, std::sin(0.5 * M_PI));
     }
 
     TEST(Juce, ADSR)

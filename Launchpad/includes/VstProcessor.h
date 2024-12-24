@@ -52,7 +52,11 @@
 #include <juce_dsp/juce_dsp.h>
 #include <atomic>
 #include "LaunchpadDriver.h"
+#ifndef JucePlugin_Name
 
+#define JucePlugin_Name �Launchpad�
+
+#endif
 class VstProcessorEditor;
 
 using namespace juce;
@@ -91,7 +95,7 @@ public:
   void setCurrentProgram(int) override {}
   const String getProgramName(int) override { return "None"; }
   void changeProgramName(int, const String &) override {}
-  AudioProcessorEditor *createEditor();
+  AudioProcessorEditor *createEditor() override;
 
   float getBpm() { return bpm; }
 

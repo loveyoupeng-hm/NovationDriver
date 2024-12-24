@@ -18,4 +18,4 @@ function(add_test_case NAME LIBS ...)
     add_test(${NAME} ${NAME})
 endfunction()
 
-add_test_case(SimpleTests juce::juce_dsp atomic)
+add_test_case(SimpleTests juce::juce_dsp "")
