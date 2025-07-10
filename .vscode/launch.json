@@ -20,5 +20,14 @@
                 "miDebuggerPath": "D:/Program Files/LLVM/bin/lldb.exe"
             }
         },
+        {
+            "name": "windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Launchpad/Launchpad_artefacts/Debug/Standalone/Launchpad.exe",
+            "cwd": "${workspaceRoot}",
+            "stopAtEntry": false,
+            "externalConsole": false,
+        }
     ]
 }

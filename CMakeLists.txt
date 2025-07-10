@@ -16,15 +16,15 @@ find_package(Threads REQUIRED)
 CPMAddPackage(
     NAME JUCE
     GITHUB_REPOSITORY juce-framework/JUCE
-    GIT_TAG 8.0.6
-    VERSION 8.0.6
+    GIT_TAG 8.0.8
+    VERSION 8.0.8
     SOURCE_DIR ${LIB_DIR}/juce
 )
 
 CPMAddPackage(
     NAME GOOGLE_TEST
     GITHUB_REPOSITORY google/googletest
-    VERSION 1.15.2
+    VERSION 1.17.0
     SOURCE_DIR ${LIB_DIR}/googletest
     OPTIONS
         "INSTALL_GTEST OFF"
