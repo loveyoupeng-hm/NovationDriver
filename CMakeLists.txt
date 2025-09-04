@@ -16,8 +16,8 @@ find_package(Threads REQUIRED)
 CPMAddPackage(
     NAME JUCE
     GITHUB_REPOSITORY juce-framework/JUCE
-    GIT_TAG 8.0.8
-    VERSION 8.0.8
+    GIT_TAG 8.0.9
+    VERSION 8.0.9
     SOURCE_DIR ${LIB_DIR}/juce
 )
 
